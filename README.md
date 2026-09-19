@@ -666,5 +666,56 @@ Penyerang menggunakan SMTP tanpa enkripsi untuk mengirim email pemerasan kepada 
 
 20. Untuk rencana pamungkasnya, Eiri menyembunyikan komunikasi malware di balik saluran terenkripsi TLS. Namun Alice telah menyediakan file keylog untuk mendekripsi lalu lintas data tersebut. Analisis file capture wired_tls_decrypt.pcapng bersama keyslogfile.txt untuk mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi. Validasi temuan kalian pada socket server: (link file) nc [IP_Group] 3407
 
+Soal ini akan menganalisis komunikasi malware yang disembunyikan menggunakan protokol TLS. Karena komunikasi TLS terenkripsi, isi HTTP tidak dapat langsung dibaca melalui Wireshark.
+Untuk membantu proses analisis, digunakan file keyslogfile.txt yang berisi informasi CLIENT_RANDOM. Keylog tersebut digunakan Wireshark untuk mendekripsi sesi TLS sehingga informasi di dalam komunikasi dapat dianalisis.  
+`keyslogfile.txt`
+Informasi yang dicari meliputi versi TLS, nama domain (SNI), IP server HTTPS, User-Agent, HTTP method, dan path.
+
+Memasukkan Keylog ke Wireshark, Langkah-langkah memasukkan keylog:
+- Buka Wireshark.
+- Pilih Edit → Preferences.
+- Pilih Protocols → TLS.
+- Cari bagian (Pre)-Master-Secret log filename.
+- Klik Browse, kemudian pilih file `keyslogfile.txt`
+- Klik OK.
+
+![a](assets/20_keylog.png)
+Jika keylog sesuai dengan sesi TLS pada capture, Wireshark dapat menampilkan isi komunikasi HTTP yang sebelumnya terenkripsi.
+
+Analisis Traffic pada Wireshark
+![a](assets/20_requestmethod.png)
+
+Dari hasil analisis, komunikasi menggunakan TLS 1.2
+
+Pada bagian Client Hello ditemukan informasi Server Name Indication (SNI):
+```bash
+example.com
+```
+Kemudian dari komunikasi TCP diketahui bahwa client 10.9.0.2 melakukan koneksi ke server HTTPS:
+```bash
+93.184.216.34:443
+```
+Setelah keylog berhasil digunakan untuk mendekripsi traffic, isi HTTP request dapat dilihat:
+```bash
+HEAD / HTTP/1.1
+Host: example.com
+User-Agent: curl/7.62.0
+Accept: */*
+```
+
+| Parameter | Hasil |
+|------------|---------|
+| Versi TLS | `TLSv1.2` |
+| Domain (SNI) | `example.com` |
+| IP Client | `10.9.0.2` |
+| IP Server HTTPS | `93.184.216.34` |
+| User-Agent | `curl/7.62.0` |
+| HTTP Method | `HEAD` |
+| Path yang Diakses | `/` |
+
+Flag: `KOMJAR26{TLS_D3crypt_wYM57ckBtTVyAaaH0r8HwPxd5}`
+
+Berdasarkan analisis, komunikasi yang terdapat pada file wired_tls_decrypt.pcapng menggunakan TLS 1.2 sehingga isi komunikasinya terenkripsi. Dengan memasukkan keyslogfile.txt, Wireshark dapat mendekripsi sesi TLS dan menampilkan kembali informasi HTTP di dalamnya.
+Hasil analisis menunjukkan bahwa client mengakses example.com pada IP 93.184.216.34 melalui port 443 menggunakan curl/7.62.0. HTTP request yang ditemukan menggunakan method HEAD dengan path /, dan server memberikan respons HTTP 200 OK.
 
 
