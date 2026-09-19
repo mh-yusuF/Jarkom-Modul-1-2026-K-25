@@ -490,18 +490,179 @@ Berbeda dengan Telnet, SSH mengenkripsi seluruh komunikasi setelah proses key ex
 17. Alice membuat halaman web di node-nya. Eiri memanfaatkan celah untuk mengunduh payload berbahaya ke sistem Alice. Analisis file capture wired_http_c2.pcap untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3404
 
+Pada soal ini akan mengidentifikasi domain tempat malware diunduh, IP server penyerang, nama file executable malware, dan status HTTP yang dikembalikan server.
 
+Hasil Analisis
+![a](assets/17_domain.png)
+Domain (Host) Malware, Dari HTTP Request ditemukan:
+```bash
+GET /navi_agent.exe HTTP/1.1
+Host: wired-update.net
+```
+Host malware: `wired-update.net`
 
+Alamat IP Server Penyerang, Hasil DNS menunjukkan:
+```bash
+wired-update.net -> 203.0.113.42
+```
+Kemudian koneksi HTTP dilakukan ke:
+```bash
+10.7.1.50 -> 203.0.113.42:80
+```
+IP server penyerang: `203.0.113.42`
 
-![wireshark](assets/17_hostkode.png)
+Nama File Malware, Pada request HTTP:
+```bash
+GET /navi_agent.exe HTTP/1.1
+```
+Dan pada response:
+```bash
+Content-Disposition: attachment;
+filename="navi_agent.exe"
+```
+Nama malware: `navi_agent.exe`
 
-![wireshark](assets/17_statushttp.png)
+![a](assets/17_hostkode.png)
+
+Status HTTP, Response server:
+```bash
+HTTP/1.1 200 OK
+```
+Status HTTP: `200 OK`
+![a](assets/17_statushttp.png)
+
+| Parameter | Hasil |
+|------------|---------|
+| Domain (Host) | `wired-update.net` |
+| IP Server Penyerang | `203.0.113.42` |
+| Nama File Malware | `navi_agent.exe` |
+| HTTP Method | `GET` |
+| HTTP Status Code | `200 OK` |
+
+Flag: `KOMJAR26{Navi_C2_D0wnl04d_Ob8yvOfKXKjurQbeUvXKMViI2}`
+
+Node Alice mengakses domain wired-update.net yang mengarah ke IP 203.0.113.42. Dari server tersebut diunduh file executable bernama navi_agent.exe. Server merespons dengan status HTTP 200 OK, menandakan file berhasil dikirim ke korban.
 
 18. Eiri mengubah taktik penyerangan dengan menanamkan file malware menggunakan protokol file sharing SMB. Analisis file capture wired_smb_transfer.pcapng untuk mengidentifikasi nama protokol jaringan yang dieksploitasi, IP pengirim dan penerima, folder tujuan penyimpanan malware pada sistem korban, serta nama file executable malware yang ditransfer. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3405
 
+Soal ini akan mengidentifikasi protokol yang digunakan, IP pengirim dan penerima, folder tujuan penyimpanan malware, serta nama file executable yang ditransfer.
+
+Hasil Analisis
+Protokol yang Dieksploitasi
+
+Lalu lintas menggunakan:
+```bash
+TCP Port 445
+SMB2 (Server Message Block)
+```
+
+Protokol: SMB (Server Message Block)
+
+IP Pengirim dan Penerima, Koneksi SMB:
+```bash
+10.7.3.100 -> 10.7.1.50
+```
+IP Pengirim (Attacker): `10.7.3.100`
+
+IP Penerima (Victim): `10.7.1.50`
+
+![a](assets/18_ip.png)
+
+Folder Tujuan Penyimpanan Malware, Dari SMB Create Request ditemukan path:
+```bash
+\\10.7.1.50\ADMIN$
+```
+Kemudian file ditulis ke:
+```bash
+System32\
+```
+Sehingga lokasi penyimpanan malware adalah:
+```bash
+C:\Windows\System32\
+```
+String UTF-16 pada paket SMB menunjukkan:
+```bash
+System32\wired_trojan_payload.exe
+```
+Nama malware: `wired_trojan_payload.exe`
+![a](assets/18_smb2.png)
+
+
+| Parameter | Hasil |
+|------------|---------|
+| Protokol yang Dieksploitasi | `SMB2` |
+| Port yang Digunakan | `TCP 445` |
+| IP Pengirim | `10.7.3.100` |
+| IP Penerima | `10.7.1.50` |
+| Nama File Malware | `wired_trojan_payload.exe` |
+| Lokasi Penyimpanan | `System32\wired_trojan_payload.exe` |
+
+Flag: `KOMJAR26{SMB_Tr4nsf3r_lxQNSpIXMxxHtoiDjajBQea1X}`
+
+Penyerang dengan IP 10.7.3.100 menggunakan protokol SMB melalui port 445 untuk menyalin malware ke host korban 10.7.1.50. Malware disimpan pada share administratif ADMIN$ di direktori System32 dengan nama file wired_trojan_payload.exe.
+
 19. Eiri meneror jaringan dengan mengirimkan email pemerasan melalui protokol SMTP tanpa enkripsi. Analisis file capture wired_smtp_threat.pcap pada stream TCP terkait, identifikasi alamat email korban yang ditargetkan, password korban yang diklaim bocor oleh penyerang, jenis malware yang diinfeksikan, batas waktu (dalam hari) yang diberikan, serta MailClientID yang tercantum pada pesan. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3406
+
+Soal ini akan mengidentifikasi alamat email korban, password yang diklaim bocor, jenis malware, batas waktu yang diberikan penyerang, serta MailClientID.
+
+Hasil Analisis
+![a](assets/19_smtp.png)
+
+Pada stream SMTP ditemukan email pemerasan berikut:
+```bash
+From: attacker@darkwired.net
+To: victim@protocol7.co.jp
+Subject: URGENT: Your Wired account has been compromised
+```
+
+Email Korban, Field:
+```bash
+To: victim@protocol7.co.jp
+```
+Email korban: `victim@protocol7.co.jp`
+
+Password yang Diklaim Bocor
+
+Isi pesan:
+```bash
+I know that:
+pr0tocol_7_user - is your password!
+```
+Password yang diklaim bocor: `pr0tocol_7_user`
+
+Jenis Malware
+
+Isi email menyatakan:
+```bash
+Your computer was infected with my private ransomware.
+```
+Jenis malware: `Ransomware`
+
+Batas Waktu Pembayaran
+```bash
+I give you 72 hours (3 days)
+```
+Batas waktu: `3 hari (72 jam)`
+
+MailClientID
+```bash
+MailClientID: 7719980706
+```
+MailClientID: `7719980706`
+
+| Parameter | Hasil |
+|------------|---------|
+| Email Korban | `victim@protocol7.co.jp` |
+| Password yang Diklaim Bocor | `pr0tocol_7_user` |
+| Jenis Malware | `Private Ransomware` |
+| Batas Waktu Pembayaran | `72 hours (3 days)` |
+| MailClientID | `7719980706` |
+
+Flag: `KOMJAR26{SMTP_Ext0rt10n_jXJG1VfM2v2ZQfXdXguO9TO3W}`
+
+Penyerang menggunakan SMTP tanpa enkripsi untuk mengirim email pemerasan kepada victim@protocol7.co.jp. Dalam pesan tersebut penyerang mengklaim mengetahui password korban yaitu pr0tocol_7_user, menyatakan telah menginfeksi sistem dengan ransomware, dan memberikan tenggat waktu 72 jam (3 hari) untuk melakukan pembayaran. Email tersebut memiliki MailClientID 7719980706.
 
 20. Untuk rencana pamungkasnya, Eiri menyembunyikan komunikasi malware di balik saluran terenkripsi TLS. Namun Alice telah menyediakan file keylog untuk mendekripsi lalu lintas data tersebut. Analisis file capture wired_tls_decrypt.pcapng bersama keyslogfile.txt untuk mengidentifikasi versi protokol TLS yang dinegosiasikan, nama domain (SNI) yang diakses, alamat IP server HTTPS penyerang, User-Agent yang digunakan, serta HTTP request method dan path yang tersembunyi di dalam sesi dekripsi. Validasi temuan kalian pada socket server: (link file) nc [IP_Group] 3407
 
