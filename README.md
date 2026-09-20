@@ -534,7 +534,7 @@ Berbeda dengan Telnet, SSH mengenkripsi seluruh komunikasi setelah proses key ex
 ![a](assets/15_ver_software.png)
 ![a](assets/15_biner.png)
 ![a](assets/15_user_pass.png)
-![a](assets/16_flag.png)
+![a](assets/16-flag.png)
 
 18. Alice membuat halaman web di node-nya. Eiri memanfaatkan celah untuk mengunduh payload berbahaya ke sistem Alice. Analisis file capture wired_http_c2.pcap untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3404
