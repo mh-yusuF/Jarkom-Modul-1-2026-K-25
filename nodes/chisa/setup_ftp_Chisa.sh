@@ -1,4 +1,4 @@
-```#!/bin/sh
+#!/bin/sh
 
 FTP_DIR="/var/wired/data"
 CONF="/etc/vsftpd/vsftpd.conf"
