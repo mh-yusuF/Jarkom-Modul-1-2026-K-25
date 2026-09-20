@@ -522,6 +522,7 @@ Berbeda dengan Telnet, SSH mengenkripsi seluruh komunikasi setelah proses key ex
 
 15. Eiri menyusup ke ruang server dan memasang perangkat keyboard USB berbahaya pada node Alice. Buka file capture wired_usb_hid.pcap, identifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3402 
+![a](assets/15_id.png)
 ![a](assets/15_step1.png)
 ![a](assets/15_step2.png)
 ![a](assets/15_flag.png)
