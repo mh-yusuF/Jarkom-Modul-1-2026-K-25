@@ -589,11 +589,56 @@ Flag
 
 16. Eiri meletakkan file malware di server. Dari file capture wired_ftp_theft.pcap, lakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3403 
-![a](assets/16_ip.png)
-![a](assets/16_ver_software.png)
-![a](assets/16_biner.png)
-![a](assets/16_user_pass.png)
-![a](assets/16-flag.png)
+
+Berikut adalah proses ekstraksi data menggunakan perintah `strings` dan `grep` untuk mendapatkan seluruh informasi yang dibutuhkan:
+
+**Alamat IP Server FTP:** 
+  Dideteksi dari respons mode pasif FTP (`227 Entering Passive Mode`) pada *traffic* transfer file malware `knights_payload.exe`:
+  ```bash
+  strings soal16_wired_ftp_theft.pcapng | grep -B 3 -A 2 "198.51.100.7"
+  ```
+  **Hasil:** `198.51.100.7`
+  
+  ![Identifikasi IP FTP Server](assets/16_biner.png)
+
+**Banner Software FTP:** 
+  Dilihat dari pesan *banner* sambutan kode status `220` saat koneksi awal:
+  ```bash
+  strings soal16_wired_ftp_theft.pcapng | grep "^220 "
+  ```
+  **Hasil:** `vsftpd 3.0.5`
+  
+  ![Banner Software FTP](assets/16_ver_software.png)
+
+**Kredensial Login Penyerang:** 
+  Diekstrak dari argumen perintah autentikasi `USER` dan `PASS` yang berhasil masuk (*Login successful*):
+  ```bash
+  strings soal16_wired_ftp_theft.pcapng | grep -E "USER|PASS"
+  ```
+  **Hasil:** `knights_agent:N4v1_s3cur3_2026`
+  
+  ![Kredensial Login FTP](assets/16_user_pass.png)
+
+**Ukuran File Malware (`knights_payload.exe`):** 
+  Ditemukan pada informasi argumen perintah unduhan biner `RETR` dan tanggapan ukuran file `SIZE`:
+  ```bash
+  strings soal16_wired_ftp_theft.pcapng | grep -C 5 -i "knights_payload.exe"
+  ```
+  **Hasil:** `524288` bytes
+  
+  ![Detail Transfer File Malware](assets/16_ip.png)
+
+
+Hubungkan diri ke server penilai menggunakan Netcat pada port `3403` dan masukkan seluruh jawaban hasil analisis di atas secara berurutan:
+
+```bash
+nc [IP_Group] 3403
+```
+
+![Validasi Socket Server Soal 16](assets/16-flag.png)
+
+Flag
+`KOMJAR26{FTP_Th3ft_7mlaJbbk59aRszAMgbKpg8x5E}`
 
 17. Alice membuat halaman web di node-nya. Eiri memanfaatkan celah untuk mengunduh payload berbahaya ke sistem Alice. Analisis file capture wired_http_c2.pcap untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3404
