@@ -39,6 +39,7 @@ e. `iptables -A FORWARD -i eth0 -o eth$i -m state --state RELATED,ESTABLISHED -j
    - **Mengizinkan Paket Masuk Kembali**: Mengizinkan paket balasan dari internet untuk masuk kembali ke jaringan lokal, khusus untuk koneksi yang statusnya sudah terhubung sebelumnya (`ESTABLISHED`) atau terkait (`RELATED`).
 
 5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
+![filterdnsicmp](assets/5_cek_status.png)
 
 6. Mika mencurigai adanya anomali traffic pada jaringannya. Jalankan genrator traffic `traffic_protocol7.sh` pada node Mika, lalu lakukan Packet Sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus menyaring paket berprotokol DNS atau ICMP.
 
