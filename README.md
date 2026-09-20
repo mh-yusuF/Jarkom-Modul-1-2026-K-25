@@ -169,6 +169,9 @@ Hasilnya
 ```
 Login ditolak karena akun telah dimasukkan ke daftar blacklist.
 
+Pembuktian 
+![bukti](assets/7_pembuktian.png)
+
 8. Kelompok Knights perlu  mengirimkan dokumen laporan intelijen ke FTP Server Chisa. Lakukan koneksi FTP client dari node Knights ke FTP Server Chisa menggunakan akun alice. Upload file `knights_report.txt` Analisis sesi Wireshark dan sebutkan perintah FTP untuk upload (STOR), kode status sukses server (226), dan port data TCP yang dinegoisasikan pada mode PASV
 
 Menghubungkan Knights ke FTP Server Chisa
