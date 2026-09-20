@@ -548,14 +548,14 @@ Flag
 
 Buka file `soal15_wired_usb_hid.pcap` di Wireshark. Masukkan filter pencarian `usb.capdata` atau amati paket komunikasi USB pada *traffic* interupsi/kontrol.
 
-![Analisis USB Traffic](15_usb.png)
+![Analisis USB Traffic](assets/15_usb.png)
 
 Dari rincian paket USB URB (misalnya Frame 26), ditemukan informasi terkait alamat perangkat:
 * **USB Device Address:** `7` (terlihat pada atribut `Device address: 7` dan *Source* `2.7.1`).
 
 Periksa paket deskriptor perangkat USB (seperti pada Paket 2) untuk melihat detail spesifikasi perangkat keras keyboard yang dicolokkan.
 
-![USB Descriptor ID](15_id.png)
+![USB Descriptor ID](assets/15_id.png)
 
 Berdasarkan *packet details* deskriptor perangkat, diperoleh informasi:
 * **Vendor ID (idVendor):** `0x046d` (Logitech, Inc.)
@@ -568,11 +568,11 @@ tshark -r soal15_wired_usb_hid.pcap -Y "usb.capdata" -T fields -e usb.capdata
 ```
 Perintah ini akan mengeluarkan deretan hex data mentah yang dikirimkan oleh interupsi endpoint keyboard setiap kali tombol ditekan oleh penyerang.
 
-![hex](15_step1.png)
+![hex](assets/15_step1.png)
 
 Lalu untuk mendapat secret massage kita perlu mengekstrak pola hex tersebut
 
-![decode](15_step2.png)
+![decode](assets/15_step2.png)
 
 Setelah kita dapatkan semua jawaban
 - Jalankan perintah netcat pada terminal untuk terhubung ke server soal[cite: 1, 2]:
@@ -581,7 +581,7 @@ Setelah kita dapatkan semua jawaban
      ```
    - Masukkan jawaban sesuai temuan analisis di atas secara berurutan hingga mendapatkan *flag*.
 
-![flag](15_flag.png)
+![flag](assets/15_flag.png)
 
 Flag
 `Wired_Protocol_7_is_alive_2026`
