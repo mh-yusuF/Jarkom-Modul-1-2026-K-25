@@ -54,13 +54,11 @@ b. `iptables -t nat -L -v -n`
    - **Cara Verifikasi**: Pastikan aturan `MASQUERADE` sudah tercatat pada rantai `POSTROUTING` untuk interface `eth0`.
 
 
-7. Mika mencurigai adanya anomali traffic pada jaringannya. Jalankan genrator traffic `traffic_protocol7.sh` pada node Mika, lalu lakukan Packet Sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus menyaring paket berprotokol DNS atau ICMP.
+6. Mika mencurigai adanya anomali traffic pada jaringannya. Jalankan genrator traffic `traffic_protocol7.sh` pada node Mika, lalu lakukan Packet Sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus menyaring paket berprotokol DNS atau ICMP.
 
 Berikut adalah hasil filter paket DNS dan ICMP
 
 ![filterdnsicmp](assets/6_filterdnsicmp.png)
-
-6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut (link file) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
 
 7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
 
