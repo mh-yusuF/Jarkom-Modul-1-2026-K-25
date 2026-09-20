@@ -517,8 +517,32 @@ Berbeda dengan Telnet, SSH mengenkripsi seluruh komunikasi setelah proses key ex
 
 14. Setelah gagal mengakses FTP, Eiri melancarkan serangan brute-force terhadap form login web Alice. Analisis file capture wired_bruteforce.pcapng untuk mengidentifikasi alamat IP penyerang, target IP beserta port yang diserang, password user lain_admin yang berhasil ditembus, serta web server software dan versi yang dilaporkan pada response header. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3401 
-![a](assets/14_answer.png)
-![a](assets/14_flag.png)
+
+### 1. Analisis Filter HTTP POST di Wireshark
+Buka file `soal14_wired_bruteforce.pcapng` menggunakan Wireshark. Masukkan filter pencarian `http.request.method == POST` untuk memfilter percobaan pengiriman data login yang dilakukan oleh penyerang[cite: 3].
+
+![Filter HTTP POST](assets/14_http.png)
+
+Dari hasil filter tersebut, kita dapat melihat bahwa IP sumber penyerang adalah **`172.26.7.50`** dan tujuan awalnya ke **`172.26.7.100`.**
+
+### 2. Melakukan *Follow TCP Stream* untuk Melihat Detail Request & Response
+Pilih salah satu paket POST (misalnya Frame 14), klik kanan, lalu pilih **Follow > TCP Stream** untuk melihat isi komunikasi secara utuh.
+
+![TCP Stream Detail](assets/14_answer.png)
+
+Berdasarkan *stream* TCP di atas, didapatkan informasi lengkap sebagai berikut:
+* **IP Penyerang:** `172.26.7.50`
+* **Target IP & Port:** `172.26.7.100:8080` (didapatkan dari *Host* header dan port layanan web server yang aktif)
+* **Password `lain_admin`:** `wired_pr0tocol_7` (dilihat dari parameter `username=lain_admin&password=wired_pr0tocol_7` yang menghasilkan respons `200 OK`)
+* **Web Server Software & Versi:** `Apache/2.4.62` (tertera pada bagian *Response Header* `Server: Apache/2.4.62`)
+
+### 3. Validasi ke Socket Server
+Hubungkan diri ke server penilai menggunakan Netcat pada port `3401` lalu masukkan jawaban yang telah dianalisis sesuai format yang diminta
+
+![Validasi Flag](assets/14_flag.png)
+
+## Flag
+`KOMJAR26{W1r3d_Brut3_SkMRlaRu4tYeAzgl4dENgRhM}`
 
 15. Eiri menyusup ke ruang server dan memasang perangkat keyboard USB berbahaya pada node Alice. Buka file capture wired_usb_hid.pcap, identifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3402 
