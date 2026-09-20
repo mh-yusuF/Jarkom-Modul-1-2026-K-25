@@ -17,6 +17,26 @@
 ![filterdnsicmp](assets/3_config_router.png)
 
 4. Lain ingin agar setiap Entitas (Client) memiliki kemandirian di The Wired. Konfigurasikan firewall/iptables (NAT Masquerade) dan DNS resolver agar setiap Client dapat terhubung ke internet secara mandiri (dapat melakukan ping ke 8.8.8.8 dan membuka domain web google.com).
+## Penjelasan Script Router iptables
+
+Script ini berfungsi untuk mengonfigurasi Linux agar bertindak sebagai router (NAT/Internet Sharing), di mana interface `eth0` adalah jalur internet utama, dan `eth1`, `eth2`, serta `eth3` adalah jaringan lokal (LAN).
+
+### Rincian Cara Kerja:
+
+a. `iptables -t nat -F`
+   - **Membersihkan (Flush) Tabel NAT**: Menghapus seluruh aturan NAT yang sudah ada sebelumnya pada tabel `nat` agar konfigurasi dimulai dari kondisi bersih (kosong).
+
+b. `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`
+   - **Mengaktifkan Masquerading (NAT)**: Mengubah alamat IP sumber dari paket data lokal yang keluar melalui `eth0` (internet) menjadi alamat IP milik `eth0`. Ini memungkinkan perangkat di jaringan lokal (LAN) bisa mengakses internet menggunakan satu IP publik/lokal dari `eth0`.
+
+c. `for i in 1 2 3; do ... done`
+   - **Looping untuk Interface Lokal**: Perulangan (loop) untuk menerapkan aturan keamanan firewall secara otomatis pada interface `eth1`, `eth2`, dan `eth3`.
+
+d. `iptables -A FORWARD -i eth$i -o eth0 -j ACCEPT`
+   - **Meneruskan Paket Keluar**: Mengizinkan (ACCEPT) lalu lintas data yang berasal dari interface lokal (`eth1`, `eth2`, `eth3`) untuk diteruskan keluar menuju internet (`eth0`).
+
+e. `iptables -A FORWARD -i eth0 -o eth$i -m state --state RELATED,ESTABLISHED -j ACCEPT`
+   - **Mengizinkan Paket Masuk Kembali**: Mengizinkan paket balasan dari internet untuk masuk kembali ke jaringan lokal, khusus untuk koneksi yang statusnya sudah terhubung sebelumnya (`ESTABLISHED`) atau terkait (`RELATED`).
 
 5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
 
