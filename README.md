@@ -540,32 +540,51 @@ Hubungkan diri ke server penilai menggunakan Netcat pada port `3401` lalu masukk
 
 ![Validasi Flag](assets/14_flag.png)
 
-## Flag
+Flag
 `KOMJAR26{W1r3d_Brut3_SkMRlaRu4tYeAzgl4dENgRhM}`
 
 15. Eiri menyusup ke ruang server dan memasang perangkat keyboard USB berbahaya pada node Alice. Buka file capture wired_usb_hid.pcap, identifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3402 
 
-Buka file `soal15_wired_usb_hid.pcap` di Wireshark. Masukkan filter pencarian `usb.capdata` atau amati paket komunikasi USB pada *traffic* interupsi/kontrol[cite: 8].
+Buka file `soal15_wired_usb_hid.pcap` di Wireshark. Masukkan filter pencarian `usb.capdata` atau amati paket komunikasi USB pada *traffic* interupsi/kontrol.
 
 ![Analisis USB Traffic](15_usb.png)
 
-Dari rincian paket USB URB (misalnya Frame 26), ditemukan informasi terkait alamat perangkat[cite: 8]:
-* **USB Device Address:** `7` (terlihat pada atribut `Device address: 7` dan *Source* `2.7.1`)[cite: 4, 8].
+Dari rincian paket USB URB (misalnya Frame 26), ditemukan informasi terkait alamat perangkat:
+* **USB Device Address:** `7` (terlihat pada atribut `Device address: 7` dan *Source* `2.7.1`).
 
-Periksa paket deskriptor perangkat USB (seperti pada Paket 2) untuk melihat detail spesifikasi perangkat keras keyboard yang dicolokkan[cite: 5].
+Periksa paket deskriptor perangkat USB (seperti pada Paket 2) untuk melihat detail spesifikasi perangkat keras keyboard yang dicolokkan.
 
 ![USB Descriptor ID](15_id.png)
 
-Berdasarkan *packet details* deskriptor perangkat, diperoleh informasi[cite: 4, 5]:
-* **Vendor ID (idVendor):** `0x046d` (Logitech, Inc.)[cite: 4, 5]
-* **Product ID (idProduct):** `0xc31c` (Keyboard K120)[cite: 4, 5]
+Berdasarkan *packet details* deskriptor perangkat, diperoleh informasi:
+* **Vendor ID (idVendor):** `0x046d` (Logitech, Inc.)
+* **Product ID (idProduct):** `0xc31c` (Keyboard K120)
 
 Gunakan *command line* `tshark` untuk mengekstrak data *payload* USB HID capdata dari file pcap:
 
 ```bash
 tshark -r soal15_wired_usb_hid.pcap -Y "usb.capdata" -T fields -e usb.capdata
 ```
+Perintah ini akan mengeluarkan deretan hex data mentah yang dikirimkan oleh interupsi endpoint keyboard setiap kali tombol ditekan oleh penyerang.
+
+![hex](15_step1.png)
+
+Lalu untuk mendapat secret massage kita perlu mengekstrak pola hex tersebut
+
+![decode](15_step2.png)
+
+Setelah kita dapatkan semua jawaban
+- Jalankan perintah netcat pada terminal untuk terhubung ke server soal[cite: 1, 2]:
+     ```bash
+     nc [IP_Group] 3402
+     ```
+   - Masukkan jawaban sesuai temuan analisis di atas secara berurutan hingga mendapatkan *flag*.
+
+![flag](15_flag.png)
+
+Flag
+`Wired_Protocol_7_is_alive_2026`
 
 
 16. Eiri meletakkan file malware di server. Dari file capture wired_ftp_theft.pcap, lakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh. Validasi temuan kalian pada socket server:
