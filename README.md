@@ -40,8 +40,21 @@ e. `iptables -A FORWARD -i eth0 -o eth$i -m state --state RELATED,ESTABLISHED -j
 
 5. Eiri tetap berupaya menanamkan kekacauan ke dalam jaringan. Untuk mengantisipasi restart tiba-tiba, pastikan seluruh konfigurasi jaringan tidak hilang saat semua node di-restart. Buat script verifikasi di /root/cek_status.sh pada router Lain yang menampilkan ringkasan interface (ip -br a) dan status tabel NAT (iptables -t nat -L -v -n) setelah reboot.
 ![filterdnsicmp](assets/5_cek_status.png)
+### Perintah Diagnostik & Pengecekan
 
-6. Mika mencurigai adanya anomali traffic pada jaringannya. Jalankan genrator traffic `traffic_protocol7.sh` pada node Mika, lalu lakukan Packet Sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus menyaring paket berprotokol DNS atau ICMP.
+a. `ip -br a`
+   - **Melihat Status IP Interface (Ringkas)**: Menampilkan daftar seluruh *network interface* (seperti `eth0`, `eth1`, dll.) beserta status operasionalnya (`UP`/`DOWN`) dan alamat IP yang terpasang dalam format tabel yang ringkas (*brief*).
+   - **Cara Verifikasi**: Pastikan semua interface (`eth0` hingga `eth3`) memiliki status `UP` dan alamat IP yang sesuai.
+
+b. `iptables -t nat -L -v -n`
+   - **Melihat Daftar Aturan NAT**: Menampilkan seluruh aturan yang ada pada tabel `nat` secara detail.
+     - `-L`: Menampilkan daftar aturan (*list*).
+     - `-v`: Menampilkan informasi detail secara verbose (jumlah paket / *packets* dan bita / *bytes* yang cocok dengan aturan).
+     - `-n`: Menampilkan alamat IP dan port dalam bentuk angka numerik (tidak melakukan *reverse DNS lookup* agar proses lebih cepat).
+   - **Cara Verifikasi**: Pastikan aturan `MASQUERADE` sudah tercatat pada rantai `POSTROUTING` untuk interface `eth0`.
+
+
+7. Mika mencurigai adanya anomali traffic pada jaringannya. Jalankan genrator traffic `traffic_protocol7.sh` pada node Mika, lalu lakukan Packet Sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus menyaring paket berprotokol DNS atau ICMP.
 
 Berikut adalah hasil filter paket DNS dan ICMP
 
