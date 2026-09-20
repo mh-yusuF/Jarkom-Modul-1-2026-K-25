@@ -60,6 +60,8 @@ Berikut adalah hasil filter paket DNS dan ICMP
 
 ![filterdnsicmp](assets/6_filterdnsicmp.png)
 
+6. Mika mencurigai adanya anomali traffic pada segmen jaringannya. Jalankan generator traffic berikut (link file) pada node Mika, lalu lakukan packet sniffing menggunakan Wireshark pada interface node Mika. Terapkan display filter khusus untuk menyaring paket yang berprotokol DNS atau ICMP. Tunjukkan screenshot hasil filter beserta ringkasan paket yang lolos.
+
 7. Chisa memutuskan mendirikan FTP Server pada node miliknya dengan shared folder di /var/wired/data. Terapkan kebijakan akses: user alice (hak akses read & write), user mika (dibatasi read-only), dan user eiri (dibatasi tanpa izin akses / blacklist). Buktikan konfigurasi dengan membuat file signal_alice.txt dari user alice, dan buktikan penolakan akses saat user eiri mencoba login.
 
 Pada soal ini, node Chisa dikonfigurasi sebagai FTP Server yang menyediakan layanan berbagi file kepada node lain dalam jaringan. Server FTP menggunakan direktori `/var/wired/data` sebagai share d folder utama. Selain itu, diterapkan kebijakan akses yang berbeda untuk setiap pengguna, yaitu:
