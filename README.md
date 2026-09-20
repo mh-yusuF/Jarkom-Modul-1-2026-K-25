@@ -545,10 +545,27 @@ Hubungkan diri ke server penilai menggunakan Netcat pada port `3401` lalu masukk
 
 15. Eiri menyusup ke ruang server dan memasang perangkat keyboard USB berbahaya pada node Alice. Buka file capture wired_usb_hid.pcap, identifikasi Vendor ID dan Product ID perangkat USB dari deskriptor USB, alamat nomor device USB, serta pesan rahasia yang berhasil dicuri dari keystroke. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3402 
-![a](assets/15_id.png)
-![a](assets/15_step1.png)
-![a](assets/15_step2.png)
-![a](assets/15_flag.png)
+
+Buka file `soal15_wired_usb_hid.pcap` di Wireshark. Masukkan filter pencarian `usb.capdata` atau amati paket komunikasi USB pada *traffic* interupsi/kontrol[cite: 8].
+
+![Analisis USB Traffic](15_usb.png)
+
+Dari rincian paket USB URB (misalnya Frame 26), ditemukan informasi terkait alamat perangkat[cite: 8]:
+* **USB Device Address:** `7` (terlihat pada atribut `Device address: 7` dan *Source* `2.7.1`)[cite: 4, 8].
+
+Periksa paket deskriptor perangkat USB (seperti pada Paket 2) untuk melihat detail spesifikasi perangkat keras keyboard yang dicolokkan[cite: 5].
+
+![USB Descriptor ID](15_id.png)
+
+Berdasarkan *packet details* deskriptor perangkat, diperoleh informasi[cite: 4, 5]:
+* **Vendor ID (idVendor):** `0x046d` (Logitech, Inc.)[cite: 4, 5]
+* **Product ID (idProduct):** `0xc31c` (Keyboard K120)[cite: 4, 5]
+
+Gunakan *command line* `tshark` untuk mengekstrak data *payload* USB HID capdata dari file pcap:
+
+```bash
+tshark -r soal15_wired_usb_hid.pcap -Y "usb.capdata" -T fields -e usb.capdata
+```
 
 
 16. Eiri meletakkan file malware di server. Dari file capture wired_ftp_theft.pcap, lakukan analisis lalu lintas FTP untuk mengidentifikasi alamat IP server FTP penyerang, banner software FTP yang digunakan, kredensial login penyerang, serta ukuran (size in bytes) dari file malware knights_payload.exe yang diunduh. Validasi temuan kalian pada socket server:
@@ -559,7 +576,7 @@ Hubungkan diri ke server penilai menggunakan Netcat pada port `3401` lalu masukk
 ![a](assets/16_user_pass.png)
 ![a](assets/16-flag.png)
 
-18. Alice membuat halaman web di node-nya. Eiri memanfaatkan celah untuk mengunduh payload berbahaya ke sistem Alice. Analisis file capture wired_http_c2.pcap untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan. Validasi temuan kalian pada socket server:
+17. Alice membuat halaman web di node-nya. Eiri memanfaatkan celah untuk mengunduh payload berbahaya ke sistem Alice. Analisis file capture wired_http_c2.pcap untuk mengidentifikasi nama domain (Host) tempat malware diunduh, alamat IP server penyerang, nama file executable malware yang diunduh, serta kode status HTTP yang dikembalikan. Validasi temuan kalian pada socket server:
 (link file) nc [IP_Group] 3404
 
 Pada soal ini akan mengidentifikasi domain tempat malware diunduh, IP server penyerang, nama file executable malware, dan status HTTP yang dikembalikan server.
