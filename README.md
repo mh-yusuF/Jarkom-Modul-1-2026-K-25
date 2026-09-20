@@ -4,7 +4,7 @@
 | Nama | NRP | 
 |---|---|
 | Muhammad Yusuf | 5027251067 |
-| Azhari Rahma Putri | 50272510  |
+| Azhari Rahma Putri | 50272510114 |
 
 ## Laporan
 1. Untuk mempersiapkan pembangunan The Wired, Lain yang berperan sebagai Router membuat tiga Switch/Gateway: Switch 1 menuju dua Entitas yaitu Alice dan Mika, Switch 2 menuju Chisa, sedangkan Switch 3 menuju Knights dan Eiri. Kelima Entitas tersebut dikonfigurasi sebagai Client di GNS3. [GUNAKAN PREFIX IP MASING-MASING KELOMPOK]
